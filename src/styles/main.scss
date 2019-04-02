@@ -1,0 +1,29 @@
+@import 'utils';
+
+body {
+  background: $oc-gray-1;
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.blind {
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-all;
+  clip: rect(0, 0, 0, 0);
+}
+.blind:before {
+  display: block;
+  width: 0;
+  height: 0;
+  font-size: 0;
+  content: '\00a0';
+}
