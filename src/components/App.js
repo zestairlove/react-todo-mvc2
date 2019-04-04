@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import PageTemplate from './PageTemplate';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
+      <PageTemplate>
         Todos
-      </div>
+      </PageTemplate>
     );
   }
 }
