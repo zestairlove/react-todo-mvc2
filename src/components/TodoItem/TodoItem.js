@@ -7,8 +7,8 @@ const cx = classNames.bind(styles);
 
 class TodoItem extends Component {
   render() {
-    const { children, isDone } = this.props;
-    
+    const { children, isDone, onRemove } = this.props;
+
     return (
       <li className={cx('todo-item')}>
         <div className={cx('todo-item__view')}>
@@ -19,14 +19,11 @@ class TodoItem extends Component {
             readOnly
           />
           <label>{children}</label>
-          <button className={cx('todo-item__del')}>
+          <button className={cx('todo-item__del')} onClick={onRemove}>
             <span className="sr-only">삭제</span>
           </button>
         </div>
-        <input
-          type="text"
-          className={cx('todo-item__edit')}
-        />
+        <input type="text" className={cx('todo-item__edit')} />
       </li>
     );
   }

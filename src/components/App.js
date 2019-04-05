@@ -34,18 +34,25 @@ class App extends Component {
     });
   };
 
+  handleRemove = id => {
+    console.log('onRemove ', id);
+    const { todos } = this.state;
+    const idx = todos.findIndex(todo => todo.id === id);
+    const nextTodos = [...todos.slice(0, idx), ...todos.slice(idx + 1)];
+
+    this.setState({
+      todos: nextTodos
+    });
+  };
+
   render() {
     const { input, todos } = this.state;
-    const { handleChange, handleInsert } = this;
+    const { handleChange, handleInsert, handleRemove } = this;
 
     return (
       <PageTemplate>
-        <Header
-          value={input}
-          onChange={handleChange}
-          onInsert={handleInsert}
-        />
-        <TodoList todos={todos} />
+        <Header value={input} onChange={handleChange} onInsert={handleInsert} />
+        <TodoList todos={todos} onRemove={handleRemove} />
         <Footer />
       </PageTemplate>
     );

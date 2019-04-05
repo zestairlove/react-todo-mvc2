@@ -8,12 +8,13 @@ const cx = classNames.bind(styles);
 
 class TodoList extends Component {
   render() {
-    const { todos } = this.props;
+    const { todos, onRemove } = this.props;
 
     const todoItems = todos.map(todo => (
       <TodoItem
         key={todo.id}
         isDone={todo.isDone}
+        onRemove={() => onRemove(todo.id)}
       >
         {todo.text}
       </TodoItem>
@@ -21,9 +22,7 @@ class TodoList extends Component {
 
     return (
       <div className={cx('todo__list-wrap')}>
-        <ul className={cx('todo__list')}>
-          {todoItems}
-        </ul>
+        <ul className={cx('todo__list')}>{todoItems}</ul>
       </div>
     );
   }
