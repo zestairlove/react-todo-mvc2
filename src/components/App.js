@@ -58,13 +58,40 @@ class App extends Component {
     });
   };
 
+  handleToggleAll = () => {
+    const { todos } = this.state;
+    const nextIsDone = todos.some(todo => !todo.isDone);
+    const nextTodos = todos.map(todo => ({ ...todo, isDone: nextIsDone }));
+    // const nextTodos = todos.map(todo =>
+    //   Object.assign({}, todo, { isDone: nextIsDone })
+    // );
+
+    this.setState({
+      todos: nextTodos
+    });
+  };
+
   render() {
     const { input, todos } = this.state;
-    const { handleChange, handleInsert, handleRemove, handleToggle } = this;
+    const {
+      handleChange,
+      handleInsert,
+      handleRemove,
+      handleToggle,
+      handleToggleAll
+    } = this;
+
+    const isAllDone = todos.every(todo => todo.isDone);
 
     return (
       <PageTemplate>
-        <Header value={input} onChange={handleChange} onInsert={handleInsert} />
+        <Header
+          value={input}
+          isAllDone={isAllDone}
+          onChange={handleChange}
+          onInsert={handleInsert}
+          onToggleAll={handleToggleAll}
+        />
         <TodoList
           todos={todos}
           onRemove={handleRemove}

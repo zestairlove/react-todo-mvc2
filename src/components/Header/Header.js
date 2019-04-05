@@ -4,12 +4,12 @@ import classNames from 'classnames/bind';
 
 const cx = classNames.bind(styles);
 
-const Header = ({ value, onChange, onInsert }) => {
+const Header = ({ value, isAllDone, onChange, onInsert, onToggleAll }) => {
   const handleKeyDown = e => {
     if (e.key === 'Enter' && e.target.value !== '') {
-      onInsert()
+      onInsert();
     }
-  }
+  };
 
   return (
     <header>
@@ -22,7 +22,13 @@ const Header = ({ value, onChange, onInsert }) => {
         onKeyDown={handleKeyDown}
       />
       <div className={cx('todo__toggle-all')}>
-        <input id="toggle-all" type="checkbox" />
+        <input
+          id="toggle-all"
+          type="checkbox"
+          readOnly
+          checked={isAllDone}
+          onClick={onToggleAll}
+        />
         <label htmlFor="toggle-all">
           <span className="sr-only">Toggle All</span>
         </label>
