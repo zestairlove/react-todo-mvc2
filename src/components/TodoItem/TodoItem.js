@@ -7,7 +7,7 @@ const cx = classNames.bind(styles);
 
 class TodoItem extends Component {
   render() {
-    const { children, isDone, onRemove } = this.props;
+    const { children, isDone, onRemove, onToggle } = this.props;
 
     return (
       <li className={cx('todo-item')}>
@@ -17,6 +17,7 @@ class TodoItem extends Component {
             className={cx('todo-item__toggle')}
             checked={isDone}
             readOnly
+            onClick={onToggle}
           />
           <label>{children}</label>
           <button className={cx('todo-item__del')} onClick={onRemove}>
