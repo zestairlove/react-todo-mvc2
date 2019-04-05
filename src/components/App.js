@@ -13,7 +13,8 @@ class App extends Component {
       { id: 1, text: 'ES6 기초', isDone: false },
       { id: 2, text: '컴포넌트 스타일링 하기', isDone: false }
     ],
-    editingId: null
+    editingId: null,
+    filterName: 'All'
   };
 
   handleChange = e => {
@@ -99,8 +100,23 @@ class App extends Component {
     });
   };
 
+  handleFilterChange = filterName => {
+    this.setState({
+      filterName
+    })
+  }
+
+  handleClearCompleted = () => {
+    const { todos } = this.state;
+    const nextTodos = todos.filter(todo => !todo.isDone);
+
+    this.setState({
+      todos: nextTodos
+    });
+  }
+
   render() {
-    const { input, todos, editingId } = this.state;
+    const { input, todos, editingId, filterName } = this.state;
     const {
       handleChange,
       handleInsert,
@@ -109,10 +125,28 @@ class App extends Component {
       handleToggleAll,
       handleEditStart,
       handleEditSave,
-      handleEditCancel
+      handleEditCancel,
+      handleFilterChange,
+      handleClearCompleted
     } = this;
 
     const isAllDone = todos.every(todo => todo.isDone);
+
+    let filteredTodos;
+    switch (filterName) {
+      case 'Active':
+        filteredTodos = todos.filter(todo => !todo.isDone);
+        break;
+      case 'Completed':
+        filteredTodos = todos.filter(todo => todo.isDone);
+        break;
+      case 'All':
+      default:
+        filteredTodos = todos;
+    }
+    const completedLength = todos.filter(todo => todo.isDone).length;
+    const shouldClearCompletedShow = completedLength > 0;
+    const activeLength = todos.length - completedLength;
 
     return (
       <PageTemplate>
@@ -124,7 +158,7 @@ class App extends Component {
           onToggleAll={handleToggleAll}
         />
         <TodoList
-          todos={todos}
+          todos={filteredTodos}
           editingId={editingId}
           onRemove={handleRemove}
           onToggle={handleToggle}
@@ -132,7 +166,13 @@ class App extends Component {
           onEditSave={handleEditSave}
           onEditCancel={handleEditCancel}
         />
-        <Footer />
+        <Footer
+          selectedFilter={filterName}
+          activeLength={activeLength}
+          shouldClearCompletedShow={shouldClearCompletedShow}
+          onFilterChange={handleFilterChange}
+          onClearCompleted={handleClearCompleted}
+        />
       </PageTemplate>
     );
   }
