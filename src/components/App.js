@@ -12,7 +12,8 @@ class App extends Component {
       { id: 0, text: '리액트 공부하기', isDone: true },
       { id: 1, text: 'ES6 기초', isDone: false },
       { id: 2, text: '컴포넌트 스타일링 하기', isDone: false }
-    ]
+    ],
+    editingId: null
   };
 
   handleChange = e => {
@@ -71,14 +72,44 @@ class App extends Component {
     });
   };
 
+  handleEditStart = id => {
+    this.setState({
+      editingId: id
+    });
+  };
+
+  handleEditSave = (id, text) => {
+    const { todos } = this.state;
+    const idx = todos.findIndex(todo => todo.id === id);
+    const nextTodos = [
+      ...todos.slice(0, idx),
+      { ...todos[idx], text },
+      ...todos.slice(idx + 1)
+    ];
+
+    this.setState({
+      todos: nextTodos,
+      editingId: null
+    });
+  };
+
+  handleEditCancel = () => {
+    this.setState({
+      editingId: null
+    });
+  };
+
   render() {
-    const { input, todos } = this.state;
+    const { input, todos, editingId } = this.state;
     const {
       handleChange,
       handleInsert,
       handleRemove,
       handleToggle,
-      handleToggleAll
+      handleToggleAll,
+      handleEditStart,
+      handleEditSave,
+      handleEditCancel
     } = this;
 
     const isAllDone = todos.every(todo => todo.isDone);
@@ -94,8 +125,12 @@ class App extends Component {
         />
         <TodoList
           todos={todos}
+          editingId={editingId}
           onRemove={handleRemove}
           onToggle={handleToggle}
+          onEditStart={handleEditStart}
+          onEditSave={handleEditSave}
+          onEditCancel={handleEditCancel}
         />
         <Footer />
       </PageTemplate>
