@@ -1,0 +1,76 @@
+@import 'utils';
+
+header {
+  position: relative;
+}
+
+.todo {
+  &__title {
+    position: absolute;
+    top: -200px;
+    width: 100%;
+    text-align: center;
+    line-height: 1.4em;
+    font-size: 100px;
+    font-weight: 100;
+    color: $oc-grape-2;
+  }
+
+  &__new-input {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 16px 16px 16px 60px;
+    border: 0 none;
+    background: $oc-gray-0;
+    font-size: 24px;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: 1.4em;
+    color: inherit;
+    box-sizing: border-box;
+    box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
+    &::placeholder {
+      font-style: italic;
+      font-weight: 300;
+      color: $oc-gray-3;
+    }
+  }
+
+  &__toggle-all input {
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    opacity: 0;
+    width: 34px;
+    height: 60px;
+    margin: 0;
+    border: none;
+    & + label {
+      width: 60px;
+      height: 34px;
+      position: absolute;
+      top: 15px;
+      left: -10px;
+      transform: rotate(90deg);
+    }
+    & + label::before {
+      content: '❯';
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      line-height: 34px;
+      font-size: 22px;
+      color: $oc-gray-3;
+    }
+    &:focus + label {
+      overflow: hidden;
+      outline: 5px auto rgb(0, 103, 244);
+      outline-offset: -2px;
+    }
+    &:checked + label::before {
+      color: $oc-green-4;
+    }
+  }
+}

@@ -3,7 +3,8 @@
 .page-template {
   min-width: 230px;
   max-width: 550px;
-  margin: 0 auto;
+  margin: 130px auto 60px;
   background: $oc-gray-0;
+  @include material-shadow(3);
   color: $oc-gray-7;
 }

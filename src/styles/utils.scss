@@ -1,1 +1,12 @@
-@import '~open-color/open-color';
+@import 'lib/all';
+
+@mixin clearfix() {
+  &::before,
+  &::after {
+    content: '';
+    display: table;
+  }
+  &::after {
+    clear: both;
+  }
+}
