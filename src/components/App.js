@@ -12,15 +12,39 @@ class App extends Component {
       { id: 0, text: '리액트 공부하기', isDone: true },
       { id: 1, text: 'ES6 기초', isDone: false },
       { id: 2, text: '컴포넌트 스타일링 하기', isDone: false }
-    ],
-  }
+    ]
+  };
+
+  handleChange = e => {
+    const { value } = e.target;
+
+    this.setState({
+      input: value
+    });
+  };
+
+  handleInsert = () => {
+    const { input, todos } = this.state;
+    const tempId = 'temp_' + Date.now();
+    const newTodo = { id: tempId, text: input, isDone: false };
+
+    this.setState({
+      input: '',
+      todos: [...todos, newTodo]
+    });
+  };
 
   render() {
     const { input, todos } = this.state;
+    const { handleChange, handleInsert } = this;
 
     return (
       <PageTemplate>
-        <Header value={input} />
+        <Header
+          value={input}
+          onChange={handleChange}
+          onInsert={handleInsert}
+        />
         <TodoList todos={todos} />
         <Footer />
       </PageTemplate>
