@@ -6,6 +6,14 @@ import styles from './Footer.module.scss';
 const cx = classNames.bind(styles);
 
 class Footer extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    const isActiveLengthChange = this.props.activeLength !== nextProps.activeLength;
+    const isClearCompletedShowChange = this.props.shouldClearCompletedShow !== nextProps.shouldClearCompletedShow;
+    const isSelectedFilterChange = this.props.selectedFilter !== nextProps.selectedFilter;
+
+    return isActiveLengthChange || isClearCompletedShowChange || isSelectedFilterChange;
+  }
+
   render() {
     const {
       selectedFilter,
