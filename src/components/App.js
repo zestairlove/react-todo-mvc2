@@ -13,8 +13,7 @@ class App extends Component {
       { id: 1, text: 'ES6 기초', isDone: false },
       { id: 2, text: '컴포넌트 스타일링 하기', isDone: false }
     ],
-    editingId: null,
-    filterName: 'All'
+    editingId: null
   };
 
   handleChange = e => {
@@ -116,7 +115,7 @@ class App extends Component {
   }
 
   render() {
-    const { input, todos, editingId, filterName } = this.state;
+    const { input, todos, editingId } = this.state;
     const {
       handleChange,
       handleInsert,
@@ -129,18 +128,20 @@ class App extends Component {
       handleFilterChange,
       handleClearCompleted
     } = this;
+    const { match: { params } } = this.props;
+    const filterName = params && (params.filterName || '');
 
     const isAllDone = todos.every(todo => todo.isDone);
 
     let filteredTodos;
     switch (filterName) {
-      case 'Active':
+      case 'active':
         filteredTodos = todos.filter(todo => !todo.isDone);
         break;
-      case 'Completed':
+      case 'completed':
         filteredTodos = todos.filter(todo => todo.isDone);
         break;
-      case 'All':
+      case '':
       default:
         filteredTodos = todos;
     }

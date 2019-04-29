@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 
 import styles from './Footer.module.scss';
@@ -23,15 +24,15 @@ class Footer extends Component {
       onClearCompleted
     } = this.props;
 
-    const filterNames = ['All', 'Active', 'Completed'];
+    const filterNames = ['', 'active', 'completed'];
     const filterItems = filterNames.map(filterName => (
       <li
         key={`filter_${filterName}`}
         className={cx({ 'is-selected': selectedFilter === filterName })}
       >
-        <a href="#none" onClick={() => onFilterChange(filterName)}>
-          {filterName}
-        </a>
+        <Link to={`/${filterName}`} onClick={() => onFilterChange(filterName)}>
+          {filterName ? filterName.replace(/^\w/, v => v.toUpperCase()) : 'All'}
+        </Link>
       </li>
     ));
 
