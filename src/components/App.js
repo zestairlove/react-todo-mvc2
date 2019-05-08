@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import * as api from '../lib/api';
 import PageTemplate from './PageTemplate';
 import Header from './Header';
 import TodoList from './TodoList';
@@ -8,13 +9,33 @@ import Footer from './Footer';
 class App extends Component {
   state = {
     input: '',
-    todos: [
-      { id: 0, text: '리액트 공부하기', isDone: true },
-      { id: 1, text: 'ES6 기초', isDone: false },
-      { id: 2, text: '컴포넌트 스타일링 하기', isDone: false }
-    ],
+    todos: [],
     editingId: null
   };
+
+  componentDidMount() {
+    this.initTodos();
+  }
+
+  initTodos() {
+    console.log('fetch todo start');
+    api.fetchTodos().then(res => {
+      const { data } = res;
+      const initialTodos = Object.keys(data).reduce((acc, key) => {
+        acc.push({ id: key, text: data[key].text, isDone: data[key].isDone });
+        return acc;
+      }, []);
+
+      this.setState({
+        todos: initialTodos
+      });
+      console.log('fetch todo complete');
+    })
+    .catch(err => {
+      console.log('fetch todo failed');
+      throw err;
+    });
+  }
 
   handleChange = e => {
     const { value } = e.target;
@@ -102,8 +123,8 @@ class App extends Component {
   handleFilterChange = filterName => {
     this.setState({
       filterName
-    })
-  }
+    });
+  };
 
   handleClearCompleted = () => {
     const { todos } = this.state;
@@ -112,7 +133,7 @@ class App extends Component {
     this.setState({
       todos: nextTodos
     });
-  }
+  };
 
   render() {
     const { input, todos, editingId } = this.state;
