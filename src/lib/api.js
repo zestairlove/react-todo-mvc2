@@ -6,3 +6,7 @@ const axi = axios.create({
 });
 
 export const fetchTodos = () => axi.get('/.json');
+
+export const insertTodo = text => axi.post('/.json', { text, isDone: false });
+
+export const removeTodo = id => axi.delete(`/${id}/.json`);

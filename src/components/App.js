@@ -32,7 +32,7 @@ class App extends Component {
       console.log('fetch todo complete');
     })
     .catch(err => {
-      console.log('fetch todo failed');
+      console.log('fetch todo fail');
       throw err;
     });
   }
@@ -48,12 +48,31 @@ class App extends Component {
   handleInsert = () => {
     const { input, todos } = this.state;
     const tempId = 'temp_' + Date.now();
-    const newTodo = { id: tempId, text: input, isDone: false };
+    const tempTodo = { id: tempId, text: input, isDone: false };
 
-    this.setState({
+    this.setState((state, props) => ({
       input: '',
-      todos: [...todos, newTodo]
-    });
+      todos: [...todos, tempTodo]
+    }));
+
+    console.log('insertTodo start');
+    api.insertTodo(input)
+      .then(res => {
+        console.log('insertTodo complete');
+        // console.log('this.state.todos', this.state.todos);
+        // console.log('todos', todos);
+        this.setState((state, props) => ({
+          todos: [...todos, { id: res.data.name, text: input, isDone: false }]
+        }));
+      })
+      .catch(err => {
+        console.log('insertTodo fail');
+        this.setState((state, props) => ({
+          todos
+        }));
+
+        throw err;
+      })
   };
 
   handleRemove = id => {
@@ -61,9 +80,23 @@ class App extends Component {
     const idx = todos.findIndex(todo => todo.id === id);
     const nextTodos = [...todos.slice(0, idx), ...todos.slice(idx + 1)];
 
-    this.setState({
+    this.setState((state, props) => ({
       todos: nextTodos
-    });
+    }));
+
+    console.log('removeTodo start');
+    api.removeTodo(id)
+      .then(res => {
+        console.log('removeTodo complete');
+      })
+      .catch(err => {
+        console.log('removeTodo fail');
+        this.setState((state, props) => ({
+          todos
+        }));
+        throw err;
+      })
+
   };
 
   handleToggle = id => {
