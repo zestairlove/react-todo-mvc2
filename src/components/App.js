@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 import * as api from '../lib/api';
 import PageTemplate from './PageTemplate';
@@ -72,7 +73,7 @@ class App extends Component {
         }));
 
         throw err;
-      })
+      });
   };
 
   handleRemove = id => {
@@ -95,22 +96,35 @@ class App extends Component {
           todos
         }));
         throw err;
-      })
-
+      });
   };
 
   handleToggle = id => {
     const { todos } = this.state;
     const idx = todos.findIndex(todo => todo.id === id);
+    const nextIsDone = !todos[idx].isDone;
     const nextTodos = [
       ...todos.slice(0, idx),
-      { ...todos[idx], isDone: !todos[idx].isDone },
+      { ...todos[idx], isDone: nextIsDone },
       ...todos.slice(idx + 1)
     ];
 
     this.setState({
       todos: nextTodos
     });
+
+    console.log('toggleTodo start');
+    api.patchTodo(id, { isDone: nextIsDone })
+      .then(res => {
+        console.log('toggleTodo complete');
+      })
+      .catch(err => {
+        console.log('toggleTodo fail');
+        this.setState((state, props) => ({
+          todos
+        }));
+        throw err;
+      });
   };
 
   handleToggleAll = () => {
@@ -124,6 +138,24 @@ class App extends Component {
     this.setState({
       todos: nextTodos
     });
+    
+    const axiArray = todos.map(todo =>
+      api.patchTodo(todo.id, { isDone: nextIsDone })
+    );
+      
+    console.log('toggleAll start');
+    axios.all(axiArray)
+      .then(res => {
+        console.log('toggleAll complete');
+      })
+      .catch(err => {
+        console.log('toggleAll fail');
+        this.setState((state, props) => ({
+          todos
+        }));
+        throw err;
+      })
+
   };
 
   handleEditStart = id => {
