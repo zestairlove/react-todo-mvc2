@@ -9,8 +9,9 @@ class TodoItem extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     const isDoneChange = this.props.isDone !== nextProps.isDone;
     const isEditing = (this.props.isEditing !== null) && (this.props.isEditing !== nextProps.isEditing);
+    const isTextChange = this.props.children !== nextProps.children;
     
-    return isDoneChange || isEditing;
+    return isDoneChange || isEditing || isTextChange;
   }
 
   componentDidUpdate(prevProps) {

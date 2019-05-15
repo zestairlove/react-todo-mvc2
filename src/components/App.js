@@ -173,10 +173,21 @@ class App extends Component {
       ...todos.slice(idx + 1)
     ];
 
-    this.setState({
+    this.setState((state, props) => ({
       todos: nextTodos,
       editingId: null
-    });
+    }));
+
+    console.log('editSave start');
+    api.patchTodo(id, { text })
+      .then(res => {
+        console.log('editSave complete');
+      })
+      .catch(err => {
+        console.log('editSave fail');
+        this.setState((state, props) => ({ todos }));
+        throw err;
+      });
   };
 
   handleEditCancel = () => {
@@ -195,9 +206,24 @@ class App extends Component {
     const { todos } = this.state;
     const nextTodos = todos.filter(todo => !todo.isDone);
 
-    this.setState({
+    this.setState((state, props) => ({
       todos: nextTodos
-    });
+    }));
+
+    const axiArray = todos
+      .filter(todo => todo.isDone)
+      .map(todo => api.removeTodo(todo.id));
+    
+    console.log('clearCompleted start');
+    axios.all(axiArray)
+      .then(res => {
+        console.log('clearCompleted complete');
+      })
+      .catch(err => {
+        console.log('clearCompleted fail');
+        this.setState((state, props) => ({ todos }));
+        throw err;
+      });
   };
 
   render() {
