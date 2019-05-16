@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import produce from 'immer';
 
 import * as api from '../lib/api';
 import PageTemplate from './PageTemplate';
@@ -51,20 +52,18 @@ class App extends Component {
     const tempId = 'temp_' + Date.now();
     const tempTodo = { id: tempId, text: input, isDone: false };
 
-    this.setState((state, props) => ({
-      input: '',
-      todos: [...todos, tempTodo]
+    this.setState(produce(draft => {
+      draft.input = '';
+      draft.todos.push(tempTodo);
     }));
 
     console.log('insertTodo start');
     api.insertTodo(input)
       .then(res => {
         console.log('insertTodo complete');
-        // console.log('this.state.todos', this.state.todos);
-        // console.log('todos', todos);
-        this.setState((state, props) => ({
-          todos: [...todos, { id: res.data.name, text: input, isDone: false }]
-        }));
+        this.setState(produce(draft => {
+          draft.todos[draft.todos.length - 1].id = res.data.name;
+        }))
       })
       .catch(err => {
         console.log('insertTodo fail');
@@ -79,10 +78,9 @@ class App extends Component {
   handleRemove = id => {
     const { todos } = this.state;
     const idx = todos.findIndex(todo => todo.id === id);
-    const nextTodos = [...todos.slice(0, idx), ...todos.slice(idx + 1)];
 
-    this.setState((state, props) => ({
-      todos: nextTodos
+    this.setState(produce(draft => {
+      draft.todos.splice(idx, 1);
     }));
 
     console.log('removeTodo start');
