@@ -101,15 +101,10 @@ class App extends Component {
     const { todos } = this.state;
     const idx = todos.findIndex(todo => todo.id === id);
     const nextIsDone = !todos[idx].isDone;
-    const nextTodos = [
-      ...todos.slice(0, idx),
-      { ...todos[idx], isDone: nextIsDone },
-      ...todos.slice(idx + 1)
-    ];
 
-    this.setState({
-      todos: nextTodos
-    });
+    this.setState(produce(draft => {
+      draft.todos[idx].isDone = nextIsDone;
+    }));
 
     console.log('toggleTodo start');
     api.patchTodo(id, { isDone: nextIsDone })
@@ -128,14 +123,10 @@ class App extends Component {
   handleToggleAll = () => {
     const { todos } = this.state;
     const nextIsDone = todos.some(todo => !todo.isDone);
-    const nextTodos = todos.map(todo => ({ ...todo, isDone: nextIsDone }));
-    // const nextTodos = todos.map(todo =>
-    //   Object.assign({}, todo, { isDone: nextIsDone })
-    // );
 
-    this.setState({
-      todos: nextTodos
-    });
+    this.setState(produce(draft => {
+      draft.todos.forEach(todo => todo.isDone = nextIsDone)
+    }));
     
     const axiArray = todos.map(todo =>
       api.patchTodo(todo.id, { isDone: nextIsDone })
@@ -152,8 +143,7 @@ class App extends Component {
           todos
         }));
         throw err;
-      })
-
+      });
   };
 
   handleEditStart = id => {
@@ -165,15 +155,10 @@ class App extends Component {
   handleEditSave = (id, text) => {
     const { todos } = this.state;
     const idx = todos.findIndex(todo => todo.id === id);
-    const nextTodos = [
-      ...todos.slice(0, idx),
-      { ...todos[idx], text },
-      ...todos.slice(idx + 1)
-    ];
 
-    this.setState((state, props) => ({
-      todos: nextTodos,
-      editingId: null
+    this.setState(produce(draft => {
+      draft.todos[idx].text = text;
+      draft.editingId = null;
     }));
 
     console.log('editSave start');
@@ -202,10 +187,9 @@ class App extends Component {
 
   handleClearCompleted = () => {
     const { todos } = this.state;
-    const nextTodos = todos.filter(todo => !todo.isDone);
 
-    this.setState((state, props) => ({
-      todos: nextTodos
+    this.setState(produce(draft => {
+      draft.todos = draft.todos.filter(todo => !todo.isDone);
     }));
 
     const axiArray = todos
