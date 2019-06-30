@@ -1,50 +1,29 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import produce from 'immer';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 import * as api from '../lib/api';
-import PageTemplate from './PageTemplate';
-import Header from './Header';
-import TodoList from './TodoList';
-import Footer from './Footer';
+import * as todosActions from '../modules/todos';
+
+import PageTemplate from '../components/PageTemplate';
+import Header from '../components/Header';
+import TodoList from '../components/TodoList';
+import Footer from '../components/Footer';
 
 class App extends Component {
-  state = {
-    input: '',
-    todos: [],
-    editingId: null
-  };
-
   componentDidMount() {
-    this.initTodos();
-  }
-
-  initTodos() {
-    console.log('fetch todo start');
-    api.fetchTodos().then(res => {
-      const { data } = res;
-      const initialTodos = Object.keys(data).reduce((acc, key) => {
-        acc.push({ id: key, text: data[key].text, isDone: data[key].isDone });
-        return acc;
-      }, []);
-
-      this.setState({
-        todos: initialTodos
-      });
-      console.log('fetch todo complete');
-    })
-    .catch(err => {
-      console.log('fetch todo fail');
-      throw err;
-    });
+    this.props.TodosActions.initTodos();
+    //this.initTodos();
   }
 
   handleChange = e => {
     const { value } = e.target;
-
-    this.setState({
-      input: value
-    });
+    // this.setState({
+    //   input: value
+    // });
+    this.props.TodosActions.changeInput(value);
   };
 
   handleInsert = () => {
@@ -209,7 +188,7 @@ class App extends Component {
   };
 
   render() {
-    const { input, todos, editingId } = this.state;
+    const { input, todos, editingId } = this.props;
     const {
       handleChange,
       handleInsert,
@@ -273,4 +252,15 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(
+  state => ({
+    input: state.input,
+    todos: state.todos,
+    editingId: state.editingId,
+    pending: state.pending,
+    error: state.error
+  }),
+  dispatch => ({
+    TodosActions: bindActionCreators(todosActions, dispatch)
+  })
+)(App);
