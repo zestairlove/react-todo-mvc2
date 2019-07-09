@@ -4,19 +4,20 @@ import { createAction, handleActions } from 'redux-actions';
 import * as api from '../lib/api';
 
 // actions types
-const CHANGE_INPUT = 'CHANGE_INPUT';
 const INIT_TODOS_PENDING = 'INIT_TODOS_PENDING';
 const INIT_TODOS_SUCCESS = 'INIT_TODOS_SUCCESS';
 const INIT_TODOS_FAILURE = 'INIT_TODOS_FAILURE';
+const INSERT_TODO_PENDING = 'INSERT_TODO_PENDING';
+const INSERT_TODO_SUCCESS = 'INSERT_TODO_SUCCESS';
+const INSERT_TODO_FAILURE = 'INSERT_TODO_FAILURE';
 
 // action creator
-export const changeInput = createAction(CHANGE_INPUT, value => value);
 const initTodosPending = createAction(INIT_TODOS_PENDING);
 const initTodosSuccess = createAction(INIT_TODOS_SUCCESS, todos => todos);
 const initTodosFailure = createAction(INIT_TODOS_FAILURE, err => err);
 export const initTodos = () => dispatch => {
   dispatch(initTodosPending());
-  console.log('init todo start');
+  console.log('initTodos start');
 
   return api.fetchTodos().then(res => {
     const { data } = res;
@@ -26,19 +27,35 @@ export const initTodos = () => dispatch => {
     }, []);
 
     dispatch(initTodosSuccess(initialTodos));
-    console.log('init todo complete');
+    console.log('initTodos complete');
   })
   .catch(err => {
     dispatch(initTodosFailure(err));
-    console.log('init todo fail');
+    console.log('initTodos fail');
     throw err;
   });
 };
 
+const insertTodoPending = createAction(INSERT_TODO_PENDING, input => input);
+const insertTodoSuccess = createAction(INSERT_TODO_SUCCESS, id => id);
+const insertTodoFailure = createAction(INSERT_TODO_FAILURE, err => err);
+export const insertTodo = () => (dispatch, getState) => {
+  dispatch(insertTodoPending());
+  console.log('insertTodo start');
+
+  return api.insertTodo(getState().input)
+    .then(res => {
+      dispatch(insertTodoSuccess(res.data.name));
+      console.log('insertTodo success');
+    })
+    .catch(err => {
+      dispatch(insertTodoFailure(err));
+      console.log('insertTodo fail');
+    });
+};
 
 // reducer
 const initialState = {
-  input: '',
   todos: [],
   editingId: null,
   pending: false,
@@ -47,13 +64,6 @@ const initialState = {
 
 export default handleActions(
   {
-    [CHANGE_INPUT]: (state, action) => {
-      const { payload: input } = action;
-
-      return produce(state, draft => {
-        draft.input = input;
-      });
-    },
     [INIT_TODOS_PENDING]: (state, action) => {
       return produce(state, draft => {
         draft.pending = true;

@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import App from './containers/App';
+import AppContainer from './containers/AppContainer';
 
 const Root = () => {
   return (
     <BrowserRouter>
-      <Route exact path="/" component={App} />
-      <Route path="/:filterName" component={App} />
+      <Route exact path="/" component={AppContainer} />
+      <Route path="/:filterName" component={AppContainer} />
     </BrowserRouter>
   );
 };

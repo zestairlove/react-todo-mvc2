@@ -1,29 +1,21 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import produce from 'immer';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 
 import * as api from '../lib/api';
-import * as todosActions from '../modules/todos';
-
-import PageTemplate from '../components/PageTemplate';
-import Header from '../components/Header';
-import TodoList from '../components/TodoList';
-import Footer from '../components/Footer';
+import PageTemplate from './PageTemplate';
+import Header from './Header';
+import TodoList from './TodoList';
+import Footer from './Footer';
 
 class App extends Component {
   componentDidMount() {
     this.props.TodosActions.initTodos();
-    //this.initTodos();
   }
 
   handleChange = e => {
     const { value } = e.target;
-    // this.setState({
-    //   input: value
-    // });
-    this.props.TodosActions.changeInput(value);
+    this.props.InputActions.changeInput(value);
   };
 
   handleInsert = () => {
@@ -252,15 +244,4 @@ class App extends Component {
   }
 }
 
-export default connect(
-  state => ({
-    input: state.input,
-    todos: state.todos,
-    editingId: state.editingId,
-    pending: state.pending,
-    error: state.error
-  }),
-  dispatch => ({
-    TodosActions: bindActionCreators(todosActions, dispatch)
-  })
-)(App);
+export default App;
