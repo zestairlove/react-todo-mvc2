@@ -19,31 +19,8 @@ class App extends Component {
   };
 
   handleInsert = () => {
-    const { input, todos } = this.state;
-    const tempId = 'temp_' + Date.now();
-    const tempTodo = { id: tempId, text: input, isDone: false };
-
-    this.setState(produce(draft => {
-      draft.input = '';
-      draft.todos.push(tempTodo);
-    }));
-
-    console.log('insertTodo start');
-    api.insertTodo(input)
-      .then(res => {
-        console.log('insertTodo complete');
-        this.setState(produce(draft => {
-          draft.todos[draft.todos.length - 1].id = res.data.name;
-        }))
-      })
-      .catch(err => {
-        console.log('insertTodo fail');
-        this.setState((state, props) => ({
-          todos
-        }));
-
-        throw err;
-      });
+    this.props.TodosActions.insertTodo();
+    this.props.InputActions.clearInput();
   };
 
   handleRemove = id => {

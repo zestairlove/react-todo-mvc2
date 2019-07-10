@@ -36,20 +36,24 @@ export const initTodos = () => dispatch => {
   });
 };
 
-const insertTodoPending = createAction(INSERT_TODO_PENDING, input => input);
+const insertTodoPending = createAction(INSERT_TODO_PENDING, todo => todo);
 const insertTodoSuccess = createAction(INSERT_TODO_SUCCESS, id => id);
-const insertTodoFailure = createAction(INSERT_TODO_FAILURE, err => err);
+const insertTodoFailure = createAction(INSERT_TODO_FAILURE, ({ todos, err }) => ({ todos, err }));
 export const insertTodo = () => (dispatch, getState) => {
-  dispatch(insertTodoPending());
+  const { input, todos } = getState();
+  const tempId = 'temp_' + Date.now();
+  const tempTodo = { id: tempId, text: input, isDone: false };
+
+  dispatch(insertTodoPending(tempTodo));
   console.log('insertTodo start');
 
-  return api.insertTodo(getState().input)
+  return api.insertTodo(input)
     .then(res => {
       dispatch(insertTodoSuccess(res.data.name));
       console.log('insertTodo success');
     })
     .catch(err => {
-      dispatch(insertTodoFailure(err));
+      dispatch(insertTodoFailure({ todos, err }));
       console.log('insertTodo fail');
     });
 };
@@ -81,6 +85,32 @@ export default handleActions(
       const { payload: err } = action;
       console.error(err);
       return produce(state, draft => {
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [INSERT_TODO_PENDING]: (state, action) => {
+      return produce(state, draft => {
+        const { payload: tempTodo } = action;
+        //console.log('insertTodoPending', tempTodo);
+        draft.todos.push(tempTodo);
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [INSERT_TODO_SUCCESS]: (state, action) => {
+      const { payload: id } = action;
+      //console.log('insertTodoSucess', id);
+      return produce(state, draft => {
+        draft.todos[draft.todos.length - 1].id = id;
+        draft.pending = false;
+      });
+    },
+    [INSERT_TODO_FAILURE]: (state, action) => {
+      const { todos, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos = todos;
         draft.pending = false;
         draft.error = true;
       });
