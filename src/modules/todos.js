@@ -13,6 +13,9 @@ const INSERT_TODO_FAILURE = 'INSERT_TODO_FAILURE';
 const REMOVE_TODO_PENDING = 'REMOVE_TODO_PENDING';
 const REMOVE_TODO_SUCCESS = 'REMOVE_TODO_SUCCESS';
 const REMOVE_TODO_FAILURE = 'REMOVE_TODO_FAILURE';
+const TOGGLE_TODO_PENDING = 'TOGGLE_TODO_PENDING';
+const TOGGLE_TODO_SUCCESS = 'TOGGLE_TODO_SUCCESS';
+const TOGGLE_TODO_FAILURE = 'TOGGLE_TODO_FAILURE';
 
 // action creator
 const initTodosPending = createAction(INIT_TODOS_PENDING);
@@ -79,6 +82,28 @@ export const removeTodo = id => (dispatch, getState) => {
     .catch(err => {
       dispatch(removeTodoFailure({ todos, err }));
       console.log('removeTodo fail');
+    });
+};
+
+const toggleTodoPending = createAction(TOGGLE_TODO_PENDING, idx => idx);
+const toggleTodoSuccess = createAction(TOGGLE_TODO_SUCCESS);
+const toggleTodoFailure = createAction(TOGGLE_TODO_FAILURE, ({ idx, err }) => ({ idx, err }));
+export const toggleTodo = id => (dispatch, getState) => {
+  const { todoData: { todos } } = getState();
+  const idx = todos.findIndex(todo => todo.id === id);
+  const nextIsDone = !todos[idx].isDone;
+
+  dispatch(toggleTodoPending(idx));
+  console.log('toggleTodo start');
+ 
+  api.patchTodo(id, { isDone: nextIsDone })
+    .then(res => {
+      dispatch(toggleTodoSuccess());
+      console.log('toggleTodo complete');
+    })
+    .catch(err => {
+      dispatch(toggleTodoFailure({ idx, err }));
+      console.log('toggleTodo failure');
     });
 };
 
@@ -155,6 +180,28 @@ export default handleActions(
       console.error(err);
       return produce(state, draft => {
         draft.todos = todos;
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [TOGGLE_TODO_PENDING]: (state, action) => {
+      return produce(state, draft => {
+        const { payload: idx } = action;
+        draft.todos[idx].isDone = !draft.todos[idx].isDone;
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [TOGGLE_TODO_SUCCESS]: (state, action) => {
+      return produce(state, draft => {
+        draft.pending = false;
+      });
+    },
+    [TOGGLE_TODO_FAILURE]: (state, action) => {
+      const { idx, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos[idx].isDone = !draft.todos[idx].isDone;
         draft.pending = false;
         draft.error = true;
       });

@@ -25,28 +25,7 @@ class App extends Component {
 
   handleRemove = id => this.props.TodosActions.removeTodo(id);
 
-  handleToggle = id => {
-    const { todos } = this.state;
-    const idx = todos.findIndex(todo => todo.id === id);
-    const nextIsDone = !todos[idx].isDone;
-
-    this.setState(produce(draft => {
-      draft.todos[idx].isDone = nextIsDone;
-    }));
-
-    console.log('toggleTodo start');
-    api.patchTodo(id, { isDone: nextIsDone })
-      .then(res => {
-        console.log('toggleTodo complete');
-      })
-      .catch(err => {
-        console.log('toggleTodo fail');
-        this.setState((state, props) => ({
-          todos
-        }));
-        throw err;
-      });
-  };
+  handleToggle = id => this.props.TodosActions.toggleTodo(id);
 
   handleToggleAll = () => {
     const { todos } = this.state;
