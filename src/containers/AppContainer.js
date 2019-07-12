@@ -7,11 +7,11 @@ import * as todosActions from '../modules/todos';
 
 export default connect(
   state => ({
-    input: state.input,
-    todos: state.todos.todos,
-    editingId: state.todos.editingId,
-    pending: state.todos.pending,
-    error: state.todos.error
+    input: state.inputData,
+    todos: state.todoData.todos,
+    editingId: state.todoData.editingId,
+    pending: state.todoData.pending,
+    error: state.todoData.error
   }),
   dispatch => ({
     InputActions: bindActionCreators(inputActions, dispatch),

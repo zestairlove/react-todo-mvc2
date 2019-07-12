@@ -23,27 +23,7 @@ class App extends Component {
     this.props.InputActions.clearInput();
   };
 
-  handleRemove = id => {
-    const { todos } = this.state;
-    const idx = todos.findIndex(todo => todo.id === id);
-
-    this.setState(produce(draft => {
-      draft.todos.splice(idx, 1);
-    }));
-
-    console.log('removeTodo start');
-    api.removeTodo(id)
-      .then(res => {
-        console.log('removeTodo complete');
-      })
-      .catch(err => {
-        console.log('removeTodo fail');
-        this.setState((state, props) => ({
-          todos
-        }));
-        throw err;
-      });
-  };
+  handleRemove = id => this.props.TodosActions.removeTodo(id);
 
   handleToggle = id => {
     const { todos } = this.state;

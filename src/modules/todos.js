@@ -10,6 +10,9 @@ const INIT_TODOS_FAILURE = 'INIT_TODOS_FAILURE';
 const INSERT_TODO_PENDING = 'INSERT_TODO_PENDING';
 const INSERT_TODO_SUCCESS = 'INSERT_TODO_SUCCESS';
 const INSERT_TODO_FAILURE = 'INSERT_TODO_FAILURE';
+const REMOVE_TODO_PENDING = 'REMOVE_TODO_PENDING';
+const REMOVE_TODO_SUCCESS = 'REMOVE_TODO_SUCCESS';
+const REMOVE_TODO_FAILURE = 'REMOVE_TODO_FAILURE';
 
 // action creator
 const initTodosPending = createAction(INIT_TODOS_PENDING);
@@ -40,7 +43,7 @@ const insertTodoPending = createAction(INSERT_TODO_PENDING, todo => todo);
 const insertTodoSuccess = createAction(INSERT_TODO_SUCCESS, id => id);
 const insertTodoFailure = createAction(INSERT_TODO_FAILURE, ({ todos, err }) => ({ todos, err }));
 export const insertTodo = () => (dispatch, getState) => {
-  const { input, todos } = getState();
+  const { inputData: input, todoData: { todos } } = getState();
   const tempId = 'temp_' + Date.now();
   const tempTodo = { id: tempId, text: input, isDone: false };
 
@@ -55,6 +58,27 @@ export const insertTodo = () => (dispatch, getState) => {
     .catch(err => {
       dispatch(insertTodoFailure({ todos, err }));
       console.log('insertTodo fail');
+    });
+};
+
+const removeTodoPending = createAction(REMOVE_TODO_PENDING, idx => idx);
+const removeTodoSuccess = createAction(REMOVE_TODO_SUCCESS);
+const removeTodoFailure = createAction(REMOVE_TODO_FAILURE, ({ todos, err }) => ({ todos, err }));
+export const removeTodo = id => (dispatch, getState) => {
+  const { todoData: { todos } } = getState();
+  const idx = todos.findIndex(todo => todo.id === id);
+
+  dispatch(removeTodoPending(idx));
+  console.log('removeTodo start');
+
+  return api.removeTodo(id)
+    .then(res => {
+      dispatch(removeTodoSuccess());
+      console.log('removeTodo complete');
+    })
+    .catch(err => {
+      dispatch(removeTodoFailure({ todos, err }));
+      console.log('removeTodo fail');
     });
 };
 
@@ -92,7 +116,6 @@ export default handleActions(
     [INSERT_TODO_PENDING]: (state, action) => {
       return produce(state, draft => {
         const { payload: tempTodo } = action;
-        //console.log('insertTodoPending', tempTodo);
         draft.todos.push(tempTodo);
         draft.pending = true;
         draft.error = false;
@@ -100,13 +123,34 @@ export default handleActions(
     },
     [INSERT_TODO_SUCCESS]: (state, action) => {
       const { payload: id } = action;
-      //console.log('insertTodoSucess', id);
       return produce(state, draft => {
         draft.todos[draft.todos.length - 1].id = id;
         draft.pending = false;
       });
     },
     [INSERT_TODO_FAILURE]: (state, action) => {
+      const { todos, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos = todos;
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [REMOVE_TODO_PENDING]: (state, action) => {
+      return produce(state, draft => {
+        const { payload: idx } = action;
+        draft.todos.splice(idx, 1);
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [REMOVE_TODO_SUCCESS]: (state, action) => {
+      return produce(state, draft => {
+        draft.pending = false;
+      });
+    },
+    [REMOVE_TODO_FAILURE]: (state, action) => {
       const { todos, err } = action.payload;
       console.error(err);
       return produce(state, draft => {
