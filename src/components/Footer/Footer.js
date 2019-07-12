@@ -20,7 +20,6 @@ class Footer extends Component {
       selectedFilter,
       activeLength,
       shouldClearCompletedShow,
-      onFilterChange,
       onClearCompleted
     } = this.props;
 
@@ -30,7 +29,7 @@ class Footer extends Component {
         key={`filter_${filterName}`}
         className={cx({ 'is-selected': selectedFilter === filterName })}
       >
-        <Link to={`/${filterName}`} onClick={() => onFilterChange(filterName)}>
+        <Link to={`/${filterName}`}>
           {filterName ? filterName.replace(/^\w/, v => v.toUpperCase()) : 'All'}
         </Link>
       </li>

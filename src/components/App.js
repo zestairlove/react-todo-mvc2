@@ -35,12 +35,6 @@ class App extends Component {
 
   handleEditCancel = () => this.props.TodosActions.editCancel();
 
-  handleFilterChange = filterName => {
-    this.setState({
-      filterName
-    });
-  };
-
   handleClearCompleted = () => {
     const { todos } = this.state;
 
@@ -75,7 +69,6 @@ class App extends Component {
       handleEditStart,
       handleEditSave,
       handleEditCancel,
-      handleFilterChange,
       handleClearCompleted
     } = this;
     const { match: { params } } = this.props;
@@ -121,7 +114,6 @@ class App extends Component {
           selectedFilter={filterName}
           activeLength={activeLength}
           shouldClearCompletedShow={shouldClearCompletedShow}
-          onFilterChange={handleFilterChange}
           onClearCompleted={handleClearCompleted}
         />
       </PageTemplate>
