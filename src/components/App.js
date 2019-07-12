@@ -27,31 +27,7 @@ class App extends Component {
 
   handleToggle = id => this.props.TodosActions.toggleTodo(id);
 
-  handleToggleAll = () => {
-    const { todos } = this.state;
-    const nextIsDone = todos.some(todo => !todo.isDone);
-
-    this.setState(produce(draft => {
-      draft.todos.forEach(todo => todo.isDone = nextIsDone)
-    }));
-    
-    const axiArray = todos.map(todo =>
-      api.patchTodo(todo.id, { isDone: nextIsDone })
-    );
-      
-    console.log('toggleAll start');
-    axios.all(axiArray)
-      .then(res => {
-        console.log('toggleAll complete');
-      })
-      .catch(err => {
-        console.log('toggleAll fail');
-        this.setState((state, props) => ({
-          todos
-        }));
-        throw err;
-      });
-  };
+  handleToggleAll = () => this.props.TodosActions.toggleAll();
 
   handleEditStart = id => {
     this.setState({

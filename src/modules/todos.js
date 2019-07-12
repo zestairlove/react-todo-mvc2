@@ -1,5 +1,6 @@
 import produce from 'immer';
 import { createAction, handleActions } from 'redux-actions';
+import axios from 'axios';
 
 import * as api from '../lib/api';
 
@@ -16,6 +17,9 @@ const REMOVE_TODO_FAILURE = 'REMOVE_TODO_FAILURE';
 const TOGGLE_TODO_PENDING = 'TOGGLE_TODO_PENDING';
 const TOGGLE_TODO_SUCCESS = 'TOGGLE_TODO_SUCCESS';
 const TOGGLE_TODO_FAILURE = 'TOGGLE_TODO_FAILURE';
+const TOGGLE_ALL_PENDING = 'TOGGLE_ALL_PENDING';
+const TOGGLE_ALL_SUCCESS = 'TOGGLE_ALL_SUCCESS';
+const TOGGLE_ALL_FAILURE = 'TOGGLE_ALL_FAILURE';
 
 // action creator
 const initTodosPending = createAction(INIT_TODOS_PENDING);
@@ -104,6 +108,31 @@ export const toggleTodo = id => (dispatch, getState) => {
     .catch(err => {
       dispatch(toggleTodoFailure({ idx, err }));
       console.log('toggleTodo failure');
+    });
+};
+
+const toggleAllPending = createAction(TOGGLE_ALL_PENDING, nextIsDone => nextIsDone);
+const toggleAllSuccess = createAction(TOGGLE_ALL_SUCCESS);
+const toggleAllFailure = createAction(TOGGLE_ALL_FAILURE, ({ todos, err }) => ({ todos, err }));
+export const toggleAll = () => (dispatch, getState) => {
+  const { todoData: { todos } } = getState();
+  const nextIsDone = todos.some(todo => !todo.isDone);
+
+  dispatch(toggleAllPending(nextIsDone));
+  console.log('toggleAll start');
+
+  const axiArray = todos.map(todo =>
+    api.patchTodo(todo.id, { isDone: nextIsDone })
+  );
+
+  axios.all(axiArray)
+    .then(res => {
+      dispatch(toggleAllSuccess());
+      console.log('toggleAll complete');
+    })
+    .catch(err => {
+      dispatch(toggleAllFailure({ todos, err }));
+      console.log('toggleAll fail');
     });
 };
 
@@ -202,6 +231,28 @@ export default handleActions(
       console.error(err);
       return produce(state, draft => {
         draft.todos[idx].isDone = !draft.todos[idx].isDone;
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [TOGGLE_ALL_PENDING]: (state, action) => {
+      return produce(state, draft => {
+        const { payload: nextIsDone } = action;
+        draft.todos.forEach(todo => todo.isDone = nextIsDone);
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [TOGGLE_ALL_SUCCESS]: (state, action) => {
+      return produce(state, draft => {
+        draft.pending = false;
+      });
+    },
+    [TOGGLE_ALL_FAILURE]: (state, action) => {
+      const { todos, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos = todos;
         draft.pending = false;
         draft.error = true;
       });
