@@ -20,6 +20,11 @@ const TOGGLE_TODO_FAILURE = 'TOGGLE_TODO_FAILURE';
 const TOGGLE_ALL_PENDING = 'TOGGLE_ALL_PENDING';
 const TOGGLE_ALL_SUCCESS = 'TOGGLE_ALL_SUCCESS';
 const TOGGLE_ALL_FAILURE = 'TOGGLE_ALL_FAILURE';
+const EDIT_START = 'EDIT_START';
+const EDIT_CANCEL = 'EDIT_CANCEL';
+const EDIT_SAVE_PENDING = 'EDIT_SAVE_PENDING';
+const EDIT_SAVE_SUCCESS = 'EDIT_SAVE_SUCCESS';
+const EDIT_SAVE_FAILURE = 'EDIT_SAVE_FAILURE';
 
 // action creator
 const initTodosPending = createAction(INIT_TODOS_PENDING);
@@ -136,6 +141,29 @@ export const toggleAll = () => (dispatch, getState) => {
     });
 };
 
+export const editStart = createAction(EDIT_START, id => id);
+export const editCancel = createAction(EDIT_CANCEL);
+const editSavePending = createAction(EDIT_SAVE_PENDING, ({ idx, text }) => ({ idx, text }));
+const editSaveSuccess = createAction(EDIT_SAVE_SUCCESS);
+const editSaveFailure = createAction(EDIT_SAVE_FAILURE, ({ todos, err }) => ({ todos, err }));
+export const editSave = (id, text) => (dispatch, getState) => {
+  const { todoData: { todos } } = getState();
+  const idx = todos.findIndex(todo => todo.id === id);
+
+  dispatch(editSavePending({ idx, text }));
+  console.log('editSave start');
+
+  api.patchTodo(id, { text })
+    .then(res => {
+      dispatch(editSaveSuccess());
+      console.log('editSave success');
+    })
+    .catch(err => {
+      dispatch(editSaveFailure({ todos, err }));
+      console.log('editSave fail');
+    });
+};
+
 // reducer
 const initialState = {
   todos: [],
@@ -168,8 +196,8 @@ export default handleActions(
       });
     },
     [INSERT_TODO_PENDING]: (state, action) => {
+      const { payload: tempTodo } = action;
       return produce(state, draft => {
-        const { payload: tempTodo } = action;
         draft.todos.push(tempTodo);
         draft.pending = true;
         draft.error = false;
@@ -192,8 +220,8 @@ export default handleActions(
       });
     },
     [REMOVE_TODO_PENDING]: (state, action) => {
+      const { payload: idx } = action;
       return produce(state, draft => {
-        const { payload: idx } = action;
         draft.todos.splice(idx, 1);
         draft.pending = true;
         draft.error = false;
@@ -214,8 +242,8 @@ export default handleActions(
       });
     },
     [TOGGLE_TODO_PENDING]: (state, action) => {
+      const { payload: idx } = action;
       return produce(state, draft => {
-        const { payload: idx } = action;
         draft.todos[idx].isDone = !draft.todos[idx].isDone;
         draft.pending = true;
         draft.error = false;
@@ -236,8 +264,8 @@ export default handleActions(
       });
     },
     [TOGGLE_ALL_PENDING]: (state, action) => {
+      const { payload: nextIsDone } = action;
       return produce(state, draft => {
-        const { payload: nextIsDone } = action;
         draft.todos.forEach(todo => todo.isDone = nextIsDone);
         draft.pending = true;
         draft.error = false;
@@ -249,6 +277,40 @@ export default handleActions(
       });
     },
     [TOGGLE_ALL_FAILURE]: (state, action) => {
+      const { todos, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos = todos;
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [EDIT_START]: (state, action) => {
+      const { payload: id } = action;
+      return produce(state, draft => {
+        draft.editingId = id;
+      });
+    },
+    [EDIT_CANCEL]: (state, action) => {
+      return produce(state, draft => {
+        draft.editingId = null;
+      });
+    },
+    [EDIT_SAVE_PENDING]: (state, action) => {
+      const { idx, text } = action.payload;
+      return produce(state, draft => {
+        draft.todos[idx].text = text;
+        draft.editingId = null;
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [EDIT_SAVE_SUCCESS]: (state, action) => {
+      return produce(state, draft => {
+        draft.pending = false;
+      });
+    },
+    [EDIT_SAVE_FAILURE]: (state, action) => {
       const { todos, err } = action.payload;
       console.error(err);
       return produce(state, draft => {

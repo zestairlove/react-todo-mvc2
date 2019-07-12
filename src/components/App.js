@@ -29,38 +29,11 @@ class App extends Component {
 
   handleToggleAll = () => this.props.TodosActions.toggleAll();
 
-  handleEditStart = id => {
-    this.setState({
-      editingId: id
-    });
-  };
+  handleEditStart = id => this.props.TodosActions.editStart(id);
 
-  handleEditSave = (id, text) => {
-    const { todos } = this.state;
-    const idx = todos.findIndex(todo => todo.id === id);
+  handleEditSave = (id, text) => this.props.TodosActions.editSave(id, text);
 
-    this.setState(produce(draft => {
-      draft.todos[idx].text = text;
-      draft.editingId = null;
-    }));
-
-    console.log('editSave start');
-    api.patchTodo(id, { text })
-      .then(res => {
-        console.log('editSave complete');
-      })
-      .catch(err => {
-        console.log('editSave fail');
-        this.setState((state, props) => ({ todos }));
-        throw err;
-      });
-  };
-
-  handleEditCancel = () => {
-    this.setState({
-      editingId: null
-    });
-  };
+  handleEditCancel = () => this.props.TodosActions.editCancel();
 
   handleFilterChange = filterName => {
     this.setState({
