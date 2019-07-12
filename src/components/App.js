@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import produce from 'immer';
 
-import * as api from '../lib/api';
 import PageTemplate from './PageTemplate';
 import Header from './Header';
 import TodoList from './TodoList';
@@ -35,28 +32,7 @@ class App extends Component {
 
   handleEditCancel = () => this.props.TodosActions.editCancel();
 
-  handleClearCompleted = () => {
-    const { todos } = this.state;
-
-    this.setState(produce(draft => {
-      draft.todos = draft.todos.filter(todo => !todo.isDone);
-    }));
-
-    const axiArray = todos
-      .filter(todo => todo.isDone)
-      .map(todo => api.removeTodo(todo.id));
-    
-    console.log('clearCompleted start');
-    axios.all(axiArray)
-      .then(res => {
-        console.log('clearCompleted complete');
-      })
-      .catch(err => {
-        console.log('clearCompleted fail');
-        this.setState((state, props) => ({ todos }));
-        throw err;
-      });
-  };
+  handleClearCompleted = () => this.props.TodosActions.clearCompleted();
 
   render() {
     const { input, todos, editingId } = this.props;

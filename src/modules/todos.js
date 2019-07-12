@@ -25,6 +25,9 @@ const EDIT_CANCEL = 'EDIT_CANCEL';
 const EDIT_SAVE_PENDING = 'EDIT_SAVE_PENDING';
 const EDIT_SAVE_SUCCESS = 'EDIT_SAVE_SUCCESS';
 const EDIT_SAVE_FAILURE = 'EDIT_SAVE_FAILURE';
+const CLEAR_COMPLETED_PENDING = 'CLEAR_COMPLETED_PENDING';
+const CLEAR_COMPLETED_SUCCESS = 'CLEAR_COMPLETED_SUCCESS';
+const CLEAR_COMPLETED_FAILURE = 'CLEAR_COMPLETED_FAILURE';
 
 // action creator
 const initTodosPending = createAction(INIT_TODOS_PENDING);
@@ -161,6 +164,30 @@ export const editSave = (id, text) => (dispatch, getState) => {
     .catch(err => {
       dispatch(editSaveFailure({ todos, err }));
       console.log('editSave fail');
+    });
+};
+
+const clearCompletedPending = createAction(CLEAR_COMPLETED_PENDING);
+const clearCompletedSuccess = createAction(CLEAR_COMPLETED_SUCCESS);
+const clearCompletedFailure = createAction(CLEAR_COMPLETED_FAILURE, ({ todos, err }) => ({ todos, err }));
+export const clearCompleted = () => (dispatch, getState) => {
+  const { todoData: { todos } } = getState();
+
+  dispatch(clearCompletedPending());
+  console.log('clearCompleted start');
+
+  const axiArray = todos
+    .filter(todo => todo.isDone)
+    .map(todo => api.removeTodo(todo.id));
+
+  axios.all(axiArray)
+    .then(res => {
+      dispatch(clearCompletedSuccess());
+      console.log('clearCompleted complete');
+    })
+    .catch(err => {
+      dispatch(clearCompletedFailure({ todos, err }));
+      console.log('clearCompleted fail');
     });
 };
 
@@ -311,6 +338,27 @@ export default handleActions(
       });
     },
     [EDIT_SAVE_FAILURE]: (state, action) => {
+      const { todos, err } = action.payload;
+      console.error(err);
+      return produce(state, draft => {
+        draft.todos = todos;
+        draft.pending = false;
+        draft.error = true;
+      });
+    },
+    [CLEAR_COMPLETED_PENDING]: (state, action) => {
+      return produce(state, draft => {
+        draft.todos = draft.todos.filter(todo => !todo.isDone);
+        draft.pending = true;
+        draft.error = false;
+      });
+    },
+    [CLEAR_COMPLETED_SUCCESS]: (state, action) => {
+      return produce(state, draft => {
+        draft.pending = false;
+      });
+    },
+    [CLEAR_COMPLETED_FAILURE]: (state, action) => {
       const { todos, err } = action.payload;
       console.error(err);
       return produce(state, draft => {

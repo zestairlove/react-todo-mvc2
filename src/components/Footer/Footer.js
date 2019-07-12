@@ -48,7 +48,7 @@ class Footer extends Component {
           })}
           onClick={onClearCompleted}
         >
-          Clear Component
+          Clear Completed
         </button>
       </footer>
     );
