@@ -108,7 +108,7 @@ export const toggleTodo = id => (dispatch, getState) => {
   dispatch(toggleTodoPending(idx));
   console.log('toggleTodo start');
  
-  api.patchTodo(id, { isDone: nextIsDone })
+  return api.patchTodo(id, { isDone: nextIsDone })
     .then(res => {
       dispatch(toggleTodoSuccess());
       console.log('toggleTodo complete');
@@ -133,7 +133,7 @@ export const toggleAll = () => (dispatch, getState) => {
     api.patchTodo(todo.id, { isDone: nextIsDone })
   );
 
-  axios.all(axiArray)
+  return axios.all(axiArray)
     .then(res => {
       dispatch(toggleAllSuccess());
       console.log('toggleAll complete');
@@ -156,7 +156,7 @@ export const editSave = (id, text) => (dispatch, getState) => {
   dispatch(editSavePending({ idx, text }));
   console.log('editSave start');
 
-  api.patchTodo(id, { text })
+  return api.patchTodo(id, { text })
     .then(res => {
       dispatch(editSaveSuccess());
       console.log('editSave success');
@@ -180,7 +180,7 @@ export const clearCompleted = () => (dispatch, getState) => {
     .filter(todo => todo.isDone)
     .map(todo => api.removeTodo(todo.id));
 
-  axios.all(axiArray)
+  return axios.all(axiArray)
     .then(res => {
       dispatch(clearCompletedSuccess());
       console.log('clearCompleted complete');
