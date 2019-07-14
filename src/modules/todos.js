@@ -56,9 +56,9 @@ export const initTodos = () => dispatch => {
 
 const insertTodoPending = createAction(INSERT_TODO_PENDING, todo => todo);
 const insertTodoSuccess = createAction(INSERT_TODO_SUCCESS, id => id);
-const insertTodoFailure = createAction(INSERT_TODO_FAILURE, ({ todos, err }) => ({ todos, err }));
+const insertTodoFailure = createAction(INSERT_TODO_FAILURE, err => err);
 export const insertTodo = () => (dispatch, getState) => {
-  const { inputData: input, todoData: { todos } } = getState();
+  const { inputData: input } = getState();
   const tempId = 'temp_' + Date.now();
   const tempTodo = { id: tempId, text: input, isDone: false };
 
@@ -71,7 +71,7 @@ export const insertTodo = () => (dispatch, getState) => {
       console.log('insertTodo success');
     })
     .catch(err => {
-      dispatch(insertTodoFailure({ todos, err }));
+      dispatch(insertTodoFailure(err));
       console.log('insertTodo fail');
     });
 };
@@ -238,10 +238,10 @@ export default handleActions(
       });
     },
     [INSERT_TODO_FAILURE]: (state, action) => {
-      const { todos, err } = action.payload;
+      const { payload: err } = action;
       console.error(err);
       return produce(state, draft => {
-        draft.todos = todos;
+        draft.todos.length = draft.todos.length - 1;
         draft.pending = false;
         draft.error = true;
       });
