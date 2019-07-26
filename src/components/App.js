@@ -4,6 +4,7 @@ import PageTemplate from './PageTemplate';
 import Header from './Header';
 import TodoList from './TodoList';
 import Footer from './Footer';
+import Status from './common/Status';
 
 class App extends Component {
   componentDidMount() {
@@ -35,7 +36,7 @@ class App extends Component {
   handleClearCompleted = () => this.props.TodosActions.clearCompleted();
 
   render() {
-    const { input, todos, editingId } = this.props;
+    const { input, todos, editingId, pending, error } = this.props;
     const {
       handleChange,
       handleInsert,
@@ -92,6 +93,7 @@ class App extends Component {
           shouldClearCompletedShow={shouldClearCompletedShow}
           onClearCompleted={handleClearCompleted}
         />
+        <Status pending={pending} error={error} />
       </PageTemplate>
     );
   }
