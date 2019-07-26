@@ -50,6 +50,7 @@
     "react-router-dom": "^5.0.0",
     "redux": "^4.0.1",
     "redux-actions": "^2.6.5",
+    "redux-promise-middleware": "^6.1.1",
     "redux-thunk": "^2.3.0",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
@@ -127,6 +128,7 @@
   },
   "devDependencies": {
     "node-sass": "^4.11.0",
-    "open-color": "^1.6.3"
+    "open-color": "^1.6.3",
+    "redux-logger": "^3.0.6"
   }
 }
